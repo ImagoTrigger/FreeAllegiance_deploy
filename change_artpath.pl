@@ -6,7 +6,7 @@ use Win32::Registry;
 
 my $reg;
 
-$::HKEY_LOCAL_MACHINE->Open("SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\1.1\\Server", $reg) 
+$::HKEY_LOCAL_MACHINE->Open("SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\1.2\\Server", $reg) 
 	or die "Can't open reg: $^E";
 
 my ($type, $value, $reserved);

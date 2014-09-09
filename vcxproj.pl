@@ -7,7 +7,7 @@ use Data::Dumper;
 
 my ($doprod,$do9) = @ARGV;
 
-my @projs = glob "C:\\build\\FAZR6\\VS2010\\*.vcxproj";
+my @projs = glob "C:\\build\\Allegiance\\VS2010\\*.vcxproj";
 foreach my $proj (@projs) {
 	open(VCX,$proj);
 	my @lines = <VCX>;

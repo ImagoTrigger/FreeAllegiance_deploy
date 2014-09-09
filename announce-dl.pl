@@ -16,5 +16,5 @@ my $string = qq{<struct><member><name>file_count</name><value><int>1</int></valu
 
 my $req = RPC::XML::ParserFactory->new()->parse($string);
 
-my $cli = RPC::XML::Client->new('http://10.0.0.5:53312/');
+my $cli = RPC::XML::Client->new('http://azforum.cloudapp.net:53312/');
 my $resp = $cli->send_request('ircannouncer.notify','build',$req);

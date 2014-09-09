@@ -38,7 +38,7 @@ if (($s && $s->Status == 4) || ($sl && $sl->Status == 4)) {
 my $bSkilled = 0;
 my $bLkilled = 0;
 
-open (PS,"C:\\pslist.exe 2>crap AllSrv |");
+open (PS,"C:\\build\\pslist.exe 2>crap AllSrv |");
 my $pid = 0;
 while (<PS>) {
 	if ($_ =~ /AllSrv\s+(\d+)/) {
@@ -49,7 +49,7 @@ close PS;
 
 if ($pid != 0) {
 	#TODO block for up to an hour untill no running games
-	my $cmd = "C:\\pskill 2>crap $pid";
+	my $cmd = "C:\\build\\pskill 2>crap $pid";
 	print "Killing AllSrv executable $pid\n";
 	`$cmd`;
 	$bSkilled = 1;
@@ -58,7 +58,7 @@ if ($pid != 0) {
 	`$cmd`;
 }
 
-open (PS,"C:\\pslist.exe 2>crap AllLobby |");
+open (PS,"C:\\build\\pslist.exe 2>crap AllLobby |");
 my $pid = 0;
 while (<PS>) {
 	if ($_ =~ /AllLobby\s+(\d+)/) {
@@ -69,7 +69,7 @@ close PS;
 
 if ($pid != 0) {
 	#TODO block for up to an hour untill no running games
-	my $cmd = "C:\\pskill 2>crap $pid";
+	my $cmd = "C:\\build\\pskill 2>crap $pid";
 	print "Killing AllLobby executable $pid\n";
 	`$cmd`;
 	$bLkilled = 1;
@@ -116,7 +116,7 @@ if ($bLkilled) {
 					"AllLobby",
 					0,
 					NORMAL_PRIORITY_CLASS|CREATE_NEW_CONSOLE,
-					"C:\\AllegBeta")|| die ErrorReport();
+					"C:\\AllegBeta")|| die "Failed to start lobby";
 	sleep(3);
 }
 
@@ -131,7 +131,7 @@ if ($bLkilled) {
 					"AllSrv",
 					0,
 					NORMAL_PRIORITY_CLASS|CREATE_NEW_CONSOLE,
-					"C:\\AllegBeta")|| die ErrorReport();
+					"C:\\AllegBeta")|| die "Failed to start AllSrv";
 
 	sleep(5);	
 #}

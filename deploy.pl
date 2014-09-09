@@ -19,11 +19,11 @@ my $ftp = Net::FTP->new("fazdev.alleg.net", Debug => 0, Port => 21122)
 
     $ftp->login("deploy",'REDACTED')
       or die "Cannot login ", $ftp->message;
-       $ftp->put("C:\\FAZBeta.cfg")
+       $ftp->put("C:\\build\\FAZBeta.cfg")
       or die "put failed ", $ftp->message;
-       $ftp->put("C:\\motdR6.mdl")
+       $ftp->put("C:\\build\\motd.mdl")
       or die "put failed ", $ftp->message;      
-       $ftp->put("C:\\serverlist.txt")
+       $ftp->put("C:\\build\\serverlist.txt")
       or die "put failed ", $ftp->message;      
        $ftp->binary;     
        $ftp->put("C:\\build\\AutoUpdate\\Filelist.txt")
@@ -55,7 +55,7 @@ while (1) {
 
  $ftp->ascii;     
  
-        $ftp->get("process.log","C:\\process.log")
+        $ftp->get("process.log","C:\\build\\process.log")
       or die "put failed ", $ftp->message;      
 
 if ($bfail) {
@@ -63,7 +63,7 @@ if ($bfail) {
 	exit 1;
 } else {
 	print "Finished! Here is the log:\n";
-	open(LOG,"C:\\process.log");
+	open(LOG,"C:\\build\\process.log");
 	while (<LOG>) {
 		print "fazdev.alleg.net>\t".$_;
 	}

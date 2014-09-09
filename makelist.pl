@@ -9,7 +9,7 @@ use File::Copy;
 
 print "Packaging deployment\n";
 
-open(LIST,">C:\\betalist.txt");
+open(LIST,">C:\\build\\betalist.txt");
 
 opendir(DIR, "C:\\build\\Package\\Artwork\\");
 my @art = readdir(DIR); 
@@ -25,8 +25,8 @@ if ($offset =~ /Daylight/i) {
 foreach my $file (@art) {
 	next if ($file =~ /^\./);
 	next if ($file !~ /cc_09|tcor_/i);
-	my $cmd = "C:\\crc32.exe C:\\build\\Package\\Artwork\\$file";
-	my $cmd2 = "C:\\mscompress.exe C:\\build\\Package\\Artwork\\$file";
+	my $cmd = "C:\\build\\crc32.exe C:\\build\\Package\\Artwork\\$file";
+	my $cmd2 = "C:\\build\\mscompress.exe C:\\build\\Package\\Artwork\\$file";
 	my ($modtime,$size)= (stat("C:\\build\\Package\\Artwork\\$file"))[9,7];
 	next if (!$size);
 	my $crc = `$cmd`;
@@ -43,8 +43,8 @@ foreach my $file (@art) {
 my @objs = ("C:\\Allegiance.exe","C:\\build\\External\\Reloader.exe");
 
 foreach my $file (@objs) {
-	my $cmd = "C:\\crc32.exe $file";
-	my $cmd2 = "C:\\mscompress.exe $file";
+	my $cmd = "C:\\build\\crc32.exe $file";
+	my $cmd2 = "C:\\build\\mscompress.exe $file";
 	my ($modtime,$size)= (stat("$file"))[9,7];
 	next if (!$size);
 	my $crc = `$cmd`;
@@ -67,11 +67,11 @@ close LIST;
 my $cmd3 = "\"C:\\Program Files\\7-Zip\\7z.exe\" a -t7z C:\\build\\AutoUpdate\\Game.7z C:\\build\\AutoUpdate\\Game\\* -xr!*Server -mx9";
 system($cmd3);
 
-open(LIST,">C:\\serverlist.txt");
+open(LIST,">C:\\build\\serverlist.txt");
 my @objs = ("C:\\AllSrv.exe","C:\\AGC.dll", "C:\\AllSrvUI.exe");
 foreach my $file (@objs) {
-	my $cmd = "C:\\crc32.exe $file";
-	my $cmd2 = "C:\\mscompress.exe $file";
+	my $cmd = "C:\\build\\crc32.exe $file";
+	my $cmd2 = "C:\\build\\mscompress.exe $file";
 	my ($modtime,$size)= (stat("$file"))[9,7];
 	next if (!$size);
 	my $crc = `$cmd`;

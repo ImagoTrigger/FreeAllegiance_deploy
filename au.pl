@@ -6,16 +6,16 @@ use POSIX;
 
 my $updated = 0;
 
-opendir(DIR, "C:\\build\\FAZR6\\Artwork");
+opendir(DIR, "C:\\build\\Artwork");
 my @svnart = readdir(DIR); 
 closedir DIR;
 
 foreach my $file (@svnart) {
 	next if ($file =~ /^\./);
-	my $cmd = "copy C:\\build\\FAZR6\\Artwork\\$file C:\\build\\Package\\Artwork /Y";
+	my $cmd = "copy C:\\build\\Artwork\\$file C:\\build\\Package\\Artwork /Y";
 	if (-e "C:\\build\\Package\\Artwork\\$file") {
 		my $modtime = (stat("C:\\build\\Package\\Artwork\\$file"))[9];
-		my $thetime = (stat("C:\\build\\FAZR6\\Artwork\\$file"))[9];
+		my $thetime = (stat("C:\\build\\Artwork\\$file"))[9];
 		if($thetime > $modtime) {
 			print "Updating $file\n";
 			system($cmd);
@@ -29,12 +29,12 @@ foreach my $file (@svnart) {
 	}
 }
 
-my $url = "http://autoupdate.alleg.net/autoupdate/game/";
-my $cmd = "lwp-download ".$url."filelist.txt C:\\_ilelist.txt";
+my $url = "http://www.allegiancezone.com/autoupdate/";
+my $cmd = "lwp-download ".$url."filelist.txt C:\\build\\_ilelist.txt";
 system($cmd);
-$cmd = "expand C:\\_ilelist.txt C:\\filelist.txt";
+$cmd = "expand C:\\build\\_ilelist.txt C:\\build\\filelist.txt";
 system($cmd);
-open(LIST,"C:\\filelist.txt");
+open(LIST,"C:\\build\\filelist.txt");
 my @lines = <LIST>;
 close LIST;
 foreach my $line (@lines) {
@@ -64,7 +64,7 @@ foreach my $line (@lines) {
 my $cmd = "\"C:\\Program Files\\7-Zip\\7z.exe\" a -t7z C:\\build\\Package\\Artwork.7z C:\\build\\Package\\* -x!*.* -xr!tmp -mx9";
 system($cmd) if ($updated);
 
-my $cmd = "copy C:\\build\\Package\\Artwork\\* C:\\build\\FAZR6\\objs10\\FZDebug\\FedSrv\\Artwork\\ /Y";
+my $cmd = "copy C:\\build\\Package\\Artwork\\* C:\\build\\Allegiance\\objs10\\FZDebug\\FedSrv\\Artwork\\ /Y";
 system($cmd) if ($updated);
 
 

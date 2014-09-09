@@ -14,7 +14,7 @@ my $artwork = "";
 my $bbeta = "";
 my $dlcode = "";
 my $clientbinary = "ASGSClient.exe";
-my $url = "http://alleg.builtbygiants.net"; #can be FTP:// 
+my $url = "ftp://azbuildslave.cloudapp.net:2121"; #can be FTP:// 
 my $cfgfile = "http://autoupdate.alleg.net/allegiance.cfg";
 
 my $asgsreg = qq{
@@ -23,15 +23,15 @@ my $asgsreg = qq{
   };
 
 if ($ver eq "1.1") {
-	$filen = "AllegR6";
-	$shortname = "R6";
-	$bbeta = "R6";
+	$filen = "Alleg";
+	$shortname = "Beta";
+	$bbeta = "Beta";
 	$asgsreg = "";
 	$clientbinary = "Allegiance.exe";
 	$cfgfile = "http://fazdev.alleg.net/FAZ/FAZbeta.cfg";
 }
 
-open(CMD,"C:\\md5sums.exe -up C:\\build\\Package\\Artwork.7z C:\\Inetpub\\wwwroot\\build\\Alleg${bbeta}PDB_b${build}_r$revision.exe |");
+open(CMD,"C:\\build\\md5sums.exe -up C:\\build\\Package\\Artwork.7z C:\\Inetpub\\wwwroot\\build\\Alleg${bbeta}PDB_b${build}_r$revision.exe |");
 my @lines = <CMD>;
 close CMD;
 foreach my $line (@lines) {
@@ -79,7 +79,7 @@ pdbredl:
 	
   MessageBox MB_YESNO|MB_ICONQUESTION "Download build Artwork?\$\\nThis release contains new artwork files! Choose Yes unless you know what you're doing" /SD IDYES IDNO dontDL2
   artredl:
-    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Artwork" /POPUP "Artwork" "$url/AllegR6ART_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\ART.7z" /END
+    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Artwork" /POPUP "Artwork" "$url/AllegArt_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\ART.7z" /END
 	Pop \$0
   md5dll::GetMD5File "\$INSTDIR\\ART.7z"
   Pop \$1
@@ -92,8 +92,8 @@ pdbredl:
   Nsis7z::ExtractWithCallback "\$INSTDIR\\ART.7z" \$R9
   GetFunctionAddress \$R9 CallbackTest
   Delete ART.7z
-  WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZR6.cfg"
-  WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZR6.cfg"
+  WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZ.cfg"
+  WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZ.cfg"
   WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "ArtPath" "\$INSTDIR\\Artwork"
   WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "ArtPAth" "\$INSTDIR\\Artwork"
   WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver\\Server" "ArtPath" "\$INSTDIR\\Artwork"
@@ -102,7 +102,7 @@ pdbredl:
   $asgsreg
   goto DL
   dontDL2:
-	 File "C:\\betareghlpV3.exe"
+	 File "C:\\build\\betareghlpV3.exe"
 	tryagain:
 	 LogEx::Write true true "Browse for Folder - Set 1.1 ArtPath"
 	ExecWait '"betareghlpV3.exe"' \$BetaSetupError
@@ -215,8 +215,8 @@ FunctionEnd
 
 !include "MUI2.nsh"
 !define MUI_ABORTWARNING
-!define MUI_ICON "C:\\allegg.ico"
-!define MUI_UNICON "C:\\allegr.ico"
+!define MUI_ICON "C:\\build\\allegg.ico"
+!define MUI_UNICON "C:\\build\\allegr.ico"
 
 !define MUI_WELCOMEFINISHPAGE_BITMAP "\${NSISDIR}\\Contrib\\Graphics\\Wizard\\orange.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "\${NSISDIR}\\Contrib\\Graphics\\Wizard\\orange-uninstall.bmp"
@@ -226,7 +226,7 @@ FunctionEnd
 
 !insertmacro MUI_PAGE_WELCOME
 
-!insertmacro MUI_PAGE_LICENSE "C:\\EULA.rtf"
+!insertmacro MUI_PAGE_LICENSE "C:\\build\\EULA.rtf"
 !insertmacro MUI_PAGE_DIRECTORY
 
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Free Allegiance"

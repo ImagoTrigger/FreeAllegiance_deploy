@@ -7,30 +7,30 @@ use File::Copy;
 print "Updating FAZBeta.cfg\n";
 
 unlink "C:\\build\\AutoUpdate\\Filelist.txt";
-my $cmd3 = "C:\\crc32.exe C:\\betalist.txt";
+my $cmd3 = "C:\\build\\crc32.exe C:\\build\\betalist.txt";
 unlink "C:\\betalist.txt_";
-my $cmd4 = "C:\\mscompress.exe C:\\betalist.txt";
+my $cmd4 = "C:\\build\\mscompress.exe C:\\build\\betalist.txt";
 `$cmd4`;
-move("C:\\betalist.txt_","C:\\build\\AutoUpdate\\Filelist.txt");
+move("C:\\build\\betalist.txt_","C:\\build\\AutoUpdate\\Filelist.txt");
 my $crc = `$cmd3`;
 chomp $crc;
 #my $size = (stat("C:\\build\\AutoUpdate\\Filelist.txt"))[7] + 1;
-my $size = (stat("C:\\betalist.txt"))[7];
+my $size = (stat("C:\\build\\betalist.txt"))[7];
 
-$cmd3 = "C:\\crc32.exe C:\\motdR6.mdl";
+$cmd3 = "C:\\build\\crc32.exe C:\\build\\motd.mdl";
 my $crc2 = `$cmd3`;
 chomp $crc2;
 
-$cmd3 = "C:\\crc32.exe C:\\serverlist.txt";
+$cmd3 = "C:\\build\\crc32.exe C:\\build\\serverlist.txt";
 my $crc3 = `$cmd3`;
 chomp $crc3;
-my $size2 = (stat("C:\\serverlist.txt"))[7];
+my $size2 = (stat("C:\\build\\serverlist.txt"))[7];
 
-open(CFG,'>C:\\FAZBeta.cfg');
+open(CFG,'>C:\\build\\FAZBeta.cfg');
 
 print CFG qq{[Allegiance]
 PublicLobby=fazdev.alleg.net
-PublicMessageURL=http://fazdev.alleg.net/FAZ/motdR6.mdl
+PublicMessageURL=http://fazdev.alleg.net/FAZ/motd.mdl
 LobbyClientPort=2302
 LobbyServerPort=2303
 FilelistSite=http://fazdev.alleg.net

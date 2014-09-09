@@ -15,7 +15,7 @@ use Proc::Daemon;
 use URI::Escape;
 
 #setup!
-my $chan = '#alleg';
+my $chan = '#FreeAllegiance';
 my $server = 'irc.quakenet.org';
 my $name = 'AllegBot';
 
@@ -37,7 +37,7 @@ $srv->reg_cb(echo => sub {my ($res_cv, @params) = @_; $res_cv->result(@params); 
 #RPC & DB init
 our $rpc = RPC::XML::Client->new('http://trac.allegiancezone.com/rpc');
 our $cli = RPC::XML::Client->new('http://trac.allegiancezone.com/ircannouncer_service');
-our $dbh = DBI->connect('dbi:Pg:dbname=trac', 'trac', 'TAZ2010') or die "$!";
+our $dbh = DBI->connect('dbi:Pg:dbname=trac', 'tracuser', 'allegdb') or die "$!";
 our $selb = $dbh->prepare(q{SELECT * FROM bitten_build WHERE id = ?}) or die $!;
 our $selr = $dbh->prepare(q{SELECT * FROM revision WHERE rev = ?}) or die $!;
 our $sela = $dbh->prepare(q{SELECT * FROM attachment WHERE type = 'build' AND id = ?}) or die $!;
