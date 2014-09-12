@@ -2,8 +2,7 @@
 # Send a step completed announcment to TracBot
 
 use strict;
-use RPC::XML;
-use RPC::XML::Client;
+use AnyEvent::JSONRPC::Lite::Client;
 
 my $b = $ARGV[0];
 my $c = $ARGV[1];
@@ -39,13 +38,9 @@ close TOUCH;
 if ($step)  {
 	$msg = "b$b Om nom nom took $duration - $step";
 } else {
-	$msg = "b$b Sending a slave to work on revision $c at http://trac.allegiancezone.com/build/$b";	
+	$msg = "b$b Sending a slave to work on revision $c at http://trac.allegiancezone.com/build/Allegiance/$b";	
 }
 
-my $string = qq{<struct><member><name>file_count</name><value><int>1</int></value></member><member><name>rev</name><value><int>534</int></value></member><member><name>url</name><value><string>http://alleg.scarybugs.net/changeset/534</string></value></member><member><name>path</name><value><string>10</string></value></member><member><name>author</name><value><string>Imago</string></value></member><member><name>message</name><value><string>$msg</string></value></member><member><name>trac</name><value><struct><member><name>name</name><value><string>Allegiance</string></value></member><member><name>url</name><value><string>http://alleg.scarybugs.net/</string></value></member><member><name>description</name><value><string>Free Allegiance</string></value></member></struct></value></member></struct>};
-
-my $req = RPC::XML::ParserFactory->new()->parse($string);
-
-my $cli = RPC::XML::Client->new('http://azforum.cloudapp.net:53312/');
-my $resp = $cli->send_request('ircannouncer.notify','build',$req);	
+my $client = AnyEvent::JSONRPC::Lite::Client->new( host => 'azforum.cloudapp.net',port => 49153);
+my $res = $client->call( echo => $msg )->recv;
 

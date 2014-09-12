@@ -24,7 +24,7 @@ if ($offset =~ /Daylight/i) {
 
 foreach my $file (@art) {
 	next if ($file =~ /^\./);
-	next if ($file !~ /cc_09|tcor_/i);
+	#next if ($file !~ /cc_09|tcor_/i);
 	my $cmd = "C:\\build\\crc32.exe C:\\build\\Package\\Artwork\\$file";
 	my $cmd2 = "C:\\build\\mscompress.exe C:\\build\\Package\\Artwork\\$file";
 	my ($modtime,$size)= (stat("C:\\build\\Package\\Artwork\\$file"))[9,7];

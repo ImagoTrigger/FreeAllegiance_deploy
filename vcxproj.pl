@@ -19,7 +19,7 @@ foreach my $proj (@projs) {
 	my $bfound2 = 0;
 	foreach my $line (@lines) {
 		my $name = $proj;
-		$name =~ s/C:\\build\\FAZR6\\VS2010\\//i;		
+		$name =~ s/C:\\build\\Allegiance\\VS2010\\//i;		
 		if ($line =~ /\<ItemDefinitionGroup Condition="'\$\(Configuration\)\|\$\(Platform\)'=='FZRetail\|Win32'"\>/i) {
 			$bfound = 1;
 		}

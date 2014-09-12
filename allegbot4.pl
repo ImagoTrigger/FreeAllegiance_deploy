@@ -11,28 +11,35 @@ use AnyEvent::JSONRPC::Lite::Server;
 use RPC::XML::Client;
 use String::IRC;
 use POSIX qw(floor);
-use Proc::Daemon;
 use URI::Escape;
+#use Data::Dumper;
 
 #setup!
 my $chan = '#FreeAllegiance';
 my $server = 'irc.quakenet.org';
-my $name = 'AllegBot';
+my $name = 'AllegZoneBot';
 
-# Daemonize
-Proc::Daemon::Init();
+#play nice
+setpriority(0, $$, 120);
+my $cmd = "cpulimit -p $$ -l 15 -b";
+system($cmd);
 
 #IRC/JSON events
 our $snow = time;
 my $c = AnyEvent->condvar;
 our $con = AnyEvent::IRC::Client->new( send_initial_whois => 1 );
-our $srv = AnyEvent::JSONRPC::Lite::Server->new( port => 53312 );
+our $srv = AnyEvent::JSONRPC::Lite::Server->new( port => 53312 ); #49153 outside
 
 #callbacks
 my $w = AnyEvent->idle (cb => sub { doIdle(time);});
 $con->reg_cb(disconnect => sub { Connect(); });
+#$con->reg_cb(debug_send => sub { print "Sending: ".Dumper(@_); });
+#$con->reg_cb(debug_recv => sub { print "Received: ".Dumper(@_); });
 $con->reg_cb(publicmsg => sub { my (undef,$chan,$msg) = @_; doMsg($msg); }); 
 $srv->reg_cb(echo => sub {my ($res_cv, @params) = @_; $res_cv->result(@params); Echo(@params); });
+
+#TODO Github!
+#$srv->reg_cb(ping => sub {my ($res_cv, @params) = @_; $res_cv->result(@params); print Dumper(@params); });
 
 #RPC & DB init
 our $rpc = RPC::XML::Client->new('http://trac.allegiancezone.com/rpc');
@@ -42,8 +49,8 @@ our $selb = $dbh->prepare(q{SELECT * FROM bitten_build WHERE id = ?}) or die $!;
 our $selr = $dbh->prepare(q{SELECT * FROM revision WHERE rev = ?}) or die $!;
 our $sela = $dbh->prepare(q{SELECT * FROM attachment WHERE type = 'build' AND id = ?}) or die $!;
 our $sele = $dbh->prepare(q{SELECT * FROM bitten_error WHERE build = ? ORDER BY orderno DESC LIMIT 1}) or die $!;
-our $sell = $dbh->prepare(q{SELECT * FROM bitten_build WHERE config = 'R6' AND status = 'S' ORDER BY id DESC LIMIT 1}) or die $!;
-our $sels = $dbh->prepare(q{SELECT bitten_step.build, bitten_step.status, bitten_step.name, bitten_step.started, bitten_step.stopped FROM bitten_step, bitten_build WHERE bitten_build.id = bitten_step.build AND slave = 'zone' ORDER BY bitten_step.stopped DESC LIMIT 1;}) or die $!;
+our $sell = $dbh->prepare(q{SELECT * FROM bitten_build WHERE config = 'Allegiance' AND status = 'S' ORDER BY id DESC LIMIT 1}) or die $!;
+our $sels = $dbh->prepare(q{SELECT bitten_step.build, bitten_step.status, bitten_step.name, bitten_step.started, bitten_step.stopped FROM bitten_step, bitten_build WHERE bitten_build.id = bitten_step.build AND slave = 'azbuildslave' ORDER BY bitten_step.stopped DESC LIMIT 1;}) or die $!;
 our $selrl = $dbh->prepare(q{SELECT * FROM revision ORDER BY time DESC LIMIT 1}) or die $!;
 our $seltl = $dbh->prepare(q{SELECT * FROM ticket ORDER BY changetime DESC LIMIT 1}) or die $!;
 
@@ -78,6 +85,7 @@ exit 0;  #Quit OK
 
 #Helper to (re) join the IRC channel
 sub Connect {
+	print "Connecting to $server/$chan\n";
 	$con->send_srv ("JOIN", $chan);
 	$con->connect ($server, 6667, { nick => $name });
 }
@@ -85,10 +93,11 @@ sub Connect {
 #Callback when no other callbacks are being called - Keeps DB cnxn alive, DBD::Pg will NOTIFY every 5 seconds (if available) - Sends chat announcment.
 sub doIdle {
 	my $now = shift;
-	if ($now - 5 > $snow) {
+	if ($now - 6 > $snow) {
 		my $notify = $dbh->pg_notifies;
 		if ($notify) {
 			my ($name, $pid, $payload) = @$notify;
+			#TODO GitHub!
 			if ($name eq 'ticket_update' || $name eq 'ticket_insert') {
 				$seltl->execute() or die $!;
 				my $tl = $seltl->fetchrow_hashref;
@@ -118,7 +127,7 @@ sub doIdle {
 					$sent = 1;
 				} elsif (($s->{status} eq 'F' || $s->{name} eq 'Done') && $valid && $sent) {
 					$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, GetBuild($s->{build})); #finish
-					$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new("http://trac.allegiancezone.com/build/R6/".$s->{build})->light_blue);
+					$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new("http://trac.allegiancezone.com/build/Allegiance/".$s->{build})->light_blue);
 					$sent = 0;
 				} else {
 					#$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, $msgprog) if ($valid); #step
@@ -127,6 +136,7 @@ sub doIdle {
 		}
     		$dbh->ping() or $con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, "It seems I've lost the connection to trac, reconnected or quit."), $dbh = DBI->connect('dbi:Pg:dbname=trac', 'trac', 'TAZ2010') or die "$!";
 		$snow = $now;
+		sleep 3;
 	}
 }
 
@@ -135,7 +145,7 @@ sub doMsg { # TODO: timer! (no flood)
 	my $msg = shift;
 	my $str = $msg->{params}[1];
 	my $tickets = "";
-	#tickets via Trac RPC API Plugin
+	#tickets via Trac RPC API Plugin  #TODO GITHUB!
 	while ($str =~ /\#(\d+)/gi) {
 		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, GetTicket($1));
 		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new("http://trac.allegiancezone.com/ticket/$1")->light_blue);
@@ -148,16 +158,16 @@ sub doMsg { # TODO: timer! (no flood)
 	#builds via PgSQL
 	while ($str =~ /b(\d+)/gi) {
 		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, GetBuild($1));
-		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new("http://trac.allegiancezone.com/build/R6/$1")->light_blue);
+		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new("http://trac.allegiancezone.com/build/Allegiance/$1")->light_blue);
 		
 	}	
 	#latest via PgSQL
 	if ($str =~ /^\!latest$/) {
 		my $ret = GetLatest();
 		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, $ret->{msg});
-		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new('http://trac.allegiancezone.com/build/R6/'.$ret->{id})->light_blue);
+		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, String::IRC->new('http://trac.allegiancezone.com/build/Allegiance/'.$ret->{id})->light_blue);
 	}
-	#search via PgSQL
+	#search via PgSQL #TODO GITHUB!
 	if ($str =~ /^\!search (.*)/) {
 		my $q = uri_escape($1);
 		$con->send_long_message ("iso-8859-1", 0, "PRIVMSG", $chan, "Pshhh, find it yourself you lazy SOB...");
@@ -165,7 +175,7 @@ sub doMsg { # TODO: timer! (no flood)
 	}	
 }
 
-#Helper when doMsg has a Ticket # - Formats IRC reply
+#Helper when doMsg has a Ticket # - Formats IRC reply #TODO GITHUB
 sub GetTicket {
 	my $tnum = shift;
 	my @resp = $rpc->simple_request('ticket.get',$tnum);
@@ -210,7 +220,7 @@ sub GetBuild {
 		my $intro = String::IRC->new('Build')->bold->underline;
 		my $error = ($e->{build} && $b->{status} eq 'F') ? ' ** Step: '.$e->{step}.' last words were: "'.$e->{message}.'"' : '';
 		my $attach = ($a->{id} && !$error) ? ' ** '. $a->{description}." - http://trac.allegiancezone.com/raw-attachment/build/$aid/".$a->{filename} : '';
-		return $intro ." b$bid: By ".$r->{author}.' for rev'.$b->{rev}.' '.$status." in $min min.$attach$error";
+		return $intro ." b$bid: By ".$r->{author}.' for '.$b->{rev}.' '.$status." in $min min.$attach$error";
 	}
 }
 

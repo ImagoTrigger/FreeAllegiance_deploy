@@ -29,6 +29,21 @@ foreach my $file (@svnart) {
 	}
 }
 
+sub Date2Timestamp {
+    my @words = split (/\s+|\/|:/, shift);
+    my $month = $words[1] - 1;
+    my $hour = $words[3];
+    my $min  = $words[4];
+    my $sec  = $words[5];
+    my $year = $words[0] - 1900;
+    return mktime($sec, $min, $hour, $words[2], $month, $year, 0, 0, -1) or die $!;
+}
+
+exit 0;
+
+__END__
+
+
 my $url = "http://www.allegiancezone.com/autoupdate/";
 my $cmd = "lwp-download ".$url."filelist.txt C:\\build\\_ilelist.txt";
 system($cmd);
@@ -68,16 +83,7 @@ my $cmd = "copy C:\\build\\Package\\Artwork\\* C:\\build\\Allegiance\\objs10\\FZ
 system($cmd) if ($updated);
 
 
-sub Date2Timestamp {
-    my @words = split (/\s+|\/|:/, shift);
-    my $month = $words[1] - 1;
-    my $hour = $words[3];
-    my $min  = $words[4];
-    my $sec  = $words[5];
-    my $year = $words[0] - 1900;
-    return mktime($sec, $min, $hour, $words[2], $month, $year, 0, 0, -1) or die $!;
-}
+
 exit 0;
 
-__END__
 

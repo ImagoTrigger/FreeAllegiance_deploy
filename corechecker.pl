@@ -1,6 +1,6 @@
 	
 
-    #Imago <imagotrigger@earthlink.net>
+    #Imago <imagotrigger@gmail.com>
     # corecheck.pl
     # Run from your text core folder in the Artwork subdirectory
      
@@ -13,12 +13,15 @@
     use Data::Dumper;
      
      
-    our $VERBOSE = 1;
+    our $VERBOSE = 0;
      
-     
+     my $artpath = $ARGV[0];
+     my $csvpath = $ARGV[1];
+print "ArtPath: $artpath\nCSVPath: $csvpath\n\n";
+
     print STDERR "\tPROCESSING SOUNDS...\n";
      
-    my @csvs = glob '*.csv';
+    my @csvs = glob $csvpath.'*.csv';
     my @sfxs = ();
      
     foreach my $file (@csvs) {
@@ -43,7 +46,7 @@
     my %wavs = ();
      
      
-    open(SOUNDDEF,"../trainingsounddef.mdl");
+    open(SOUNDDEF,$artpath."trainingsounddef.mdl");
     my @lines = <SOUNDDEF>;
     close SOUNDDEF;
      
@@ -67,7 +70,7 @@
      
     }
      
-    open(SOUNDDEF,"../sounddef.mdl");
+    open(SOUNDDEF,$artpath."sounddef.mdl");
     my @lines = <SOUNDDEF>;
     close SOUNDDEF;
     my @seen = ();
@@ -139,8 +142,8 @@
     }
      
      
-    my @files1 = glob '../*.ogg';
-    my @files2 = glob '../*.wav';
+    my @files1 = glob $artpath.'*.ogg';
+    my @files2 = glob $artpath.'*.wav';
     my @files = flatten(@files1, @files2);
      
     my $size = 0;
@@ -155,8 +158,8 @@
             if ($bfound) {
                     #print "$artfile OK\n";
             } else {
-                    $size += -s "../$artfile.ogg";
-                    $size += -s "../$artfile.wav";
+                    $size += -s $artpath."$artfile.ogg";
+                    $size += -s $artpath."$artfile.wav";
                     print "INFO: $artfile unused in this core\n" if $VERBOSE;
             }
     }
@@ -187,7 +190,7 @@
     print "\n--------------------------\n\n";
     print STDERR "\tPROCESSING GRAPHICS...\n";
      
-    my @csvs = glob '*.csv';
+    my @csvs = glob $csvpath.'*.csv';
     my @gfxs = ();
      
     foreach my $file (@csvs) {
@@ -210,7 +213,7 @@
      
      
     my @gfxs = flatten(@gfxs);
-    my @files = glob '../*.mdl';
+    my @files = glob $artpath.'*.mdl';
      
      
     my $size = 0;
@@ -229,8 +232,8 @@
             if ($bfound) {
      
             } else {
-                    $size += -s "../$artfile.mdl";
-                    $size += -s "../${artfile}bmp.mdl";
+                    $size += -s $artpath."$artfile.mdl";
+                    $size += -s $artpath."${artfile}bmp.mdl";
                     print "INFO: $artfile unused in this core\n" if $VERBOSE;
             }
     }

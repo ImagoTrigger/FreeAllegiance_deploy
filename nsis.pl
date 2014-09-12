@@ -15,23 +15,23 @@ my $bbeta = "";
 my $dlcode = "";
 my $clientbinary = "ASGSClient.exe";
 my $url = "ftp://azbuildslave.cloudapp.net:2121"; #can be FTP:// 
-my $cfgfile = "http://autoupdate.alleg.net/allegiance.cfg";
+my $cfgfile = "http://autoupdate.allegiancezone.com/config/AZ.cfg";
 
 my $asgsreg = qq{
   WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "EXE Path" "\$INSTDIR"
   WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "EXE Path" "\$INSTDIR"
   };
 
-if ($ver eq "1.1") {
+if ($ver eq "1.3") {
 	$filen = "Alleg";
 	$shortname = "Beta";
 	$bbeta = "Beta";
 	$asgsreg = "";
 	$clientbinary = "Allegiance.exe";
-	$cfgfile = "http://fazdev.alleg.net/FAZ/FAZbeta.cfg";
+	$cfgfile = "http://autoupdate.allegiancezone.com/config/AZBeta.cfg";
 }
 
-open(CMD,"C:\\build\\md5sums.exe -up C:\\build\\Package\\Artwork.7z C:\\Inetpub\\wwwroot\\build\\Alleg${bbeta}PDB_b${build}_r$revision.exe |");
+open(CMD,"C:\\build\\md5sums.exe -up C:\\build\\Package\\Artwork.7z C:\\build\\Package\\Alleg${bbeta}PDB_b${build}_$revision.exe |");
 my @lines = <CMD>;
 close CMD;
 foreach my $line (@lines) {
@@ -62,7 +62,7 @@ if ($bfull) {
 	$dlcode = qq{
  MessageBox MB_YESNO|MB_ICONQUESTION "Download program databases for debugging?\$\\nIf you don't know what this is, click No" /SD IDYES IDNO dontDL
 pdbredl:
-    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Program Database" /POPUP "Program database" "$url/Alleg${bbeta}PDB_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\PDB.7z" /END
+    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Program Database" /POPUP "Program database" "$url/Alleg${bbeta}PDB_b\${PRODUCT_BUILD}_\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\PDB.7z" /END
 	Pop \$0
   md5dll::GetMD5File "\$INSTDIR\\PDB.7z"
   Pop \$1
@@ -79,7 +79,7 @@ pdbredl:
 	
   MessageBox MB_YESNO|MB_ICONQUESTION "Download build Artwork?\$\\nThis release contains new artwork files! Choose Yes unless you know what you're doing" /SD IDYES IDNO dontDL2
   artredl:
-    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Artwork" /POPUP "Artwork" "$url/AllegArt_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\ART.7z" /END
+    inetc::get /RESUME "Network connection problem.  Please reconnect and click Retry to resume downloading" /CAPTION "Artwork" /POPUP "Artwork" "$url/AllegArt_b\${PRODUCT_BUILD}_\${PRODUCT_CHANGE}.exe" "\$INSTDIR\\ART.7z" /END
 	Pop \$0
   md5dll::GetMD5File "\$INSTDIR\\ART.7z"
   Pop \$1
@@ -92,8 +92,8 @@ pdbredl:
   Nsis7z::ExtractWithCallback "\$INSTDIR\\ART.7z" \$R9
   GetFunctionAddress \$R9 CallbackTest
   Delete ART.7z
-  WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZ.cfg"
-  WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "http://fazdev.alleg.net/FAZ/FAZ.cfg"
+  WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "$cfgfile"
+  WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "CfgFile" "$cfgfile"
   WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "ArtPath" "\$INSTDIR\\Artwork"
   WriteRegStr HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "ArtPAth" "\$INSTDIR\\Artwork"
   WriteRegStr HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver\\Server" "ArtPath" "\$INSTDIR\\Artwork"
@@ -104,7 +104,7 @@ pdbredl:
   dontDL2:
 	 File "C:\\build\\betareghlpV3.exe"
 	tryagain:
-	 LogEx::Write true true "Browse for Folder - Set 1.1 ArtPath"
+	 LogEx::Write true true "Browse for Folder - Set $ver ArtPath"
 	ExecWait '"betareghlpV3.exe"' \$BetaSetupError
 	ReadRegStr \$ARTPATH HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" ArtPath
 	StrCmp \$ARTPATH "" nextone
@@ -124,8 +124,8 @@ Delete "betareghlpV3.exe"
 my $nsis = <<END_NSIS;
 !define PRODUCT_NAME "Allegiance"
 !define PRODUCT_VERSION "$ver"
-!define PRODUCT_PUBLISHER "Free Allegiance"
-!define PRODUCT_WEB_SITE "http://freeallegiance.org"
+!define PRODUCT_PUBLISHER "Allegiance Zone"
+!define PRODUCT_WEB_SITE "http://allegiancezone.com"
 !define PRODUCT_DIR_REGKEY "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Allegiance\\$ver"
 !define PRODUCT_UNINST_KEY "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\\${PRODUCT_PUBLISHER}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -229,7 +229,7 @@ FunctionEnd
 !insertmacro MUI_PAGE_LICENSE "C:\\build\\EULA.rtf"
 !insertmacro MUI_PAGE_DIRECTORY
 
-!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Free Allegiance"
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "Allegiance Zone"
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "\${PRODUCT_UNINST_ROOT_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "\${PRODUCT_UNINST_KEY}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "\${PRODUCT_STARTMENU_REGVAL}"
@@ -250,7 +250,7 @@ Var ICONS_GROUP
 ;******************************************
 ;
 
-Name "\${PRODUCT_NAME} \${PRODUCT_VERSION} (b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE})"
+Name "\${PRODUCT_NAME} \${PRODUCT_VERSION} (b\${PRODUCT_BUILD}_\${PRODUCT_CHANGE})"
 Var DirectXSetupError
 var ArtPath
 
@@ -258,11 +258,11 @@ InstallDirRegKey HKLM "\${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-OutFile "C:\\Inetpub\\wwwroot\\build\\${shortname}_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.exe"
+OutFile "C:\\build\\Package\\${shortname}_b\${PRODUCT_BUILD}_\${PRODUCT_CHANGE}.exe"
 
 InstallDir "C:\\$filen"
 
-BrandingText "Free Allegiance - http://www.freeallegiance.org" 
+BrandingText "Allegiance Zone - http://www.allegiancezone.com" 
 
 ; Request application privileges for Windows Vista/Win7
 RequestExecutionLevel admin
@@ -283,7 +283,7 @@ Section "" ;No components page, name is not important
 
   SetOutPath \$INSTDIR
 
- LogEx::Init true "${shortname}_b\${PRODUCT_BUILD}_r\${PRODUCT_CHANGE}.log"
+ LogEx::Init true "${shortname}_b\${PRODUCT_BUILD}_\${PRODUCT_CHANGE}.log"
 
 nsisos::osversion
 StrCpy \$R0 \$0
@@ -294,9 +294,9 @@ StrCpy \$R1 \$1
 
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "\$SMPROGRAMS\\\$ICONS_GROUP"
-  CreateShortCut "\$SMPROGRAMS\\\$ICONS_GROUP\\Free Allegiance.lnk" "\$INSTDIR\\$clientbinary"
+  CreateShortCut "\$SMPROGRAMS\\\$ICONS_GROUP\\Allegiance Zone.lnk" "\$INSTDIR\\$clientbinary"
   CreateShortCut "\$SMPROGRAMS\\\$ICONS_GROUP\\Allegiance Learning Guide.lnk" "\$INSTDIR\\Allegiance Learning Guide.lnk"
-  CreateShortCut "\$DESKTOP\\Free Allegiance.lnk" "\$INSTDIR\\$clientbinary"
+  CreateShortCut "\$DESKTOP\\Allegiance Zone.lnk" "\$INSTDIR\\$clientbinary"
   !insertmacro MUI_STARTMENU_WRITE_END
 
   SetCompress off
@@ -326,12 +326,12 @@ DeleteRegValue HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "Ar
 DontDelReg:
 
 ; Install Trusted Certificate Authority - To issue a developer certificate you'll need h0tp0ck3t$  };-)
-File C:\\FAOCA10.cer
-Push \$INSTDIR\\FAOCA10.cer
+File C:\\build\\AZCA.cer
+Push \$INSTDIR\\AZCA.cer
 Call AddCertificateToStore
 Pop \$0
-LogEx::Write true true "Installing the FAO CA returned: \$0"
-Delete FAOCA10.cer
+LogEx::Write true true "Installing the AZ CA returned: \$0"
+Delete AZCA.cer
 
 DeleteRegValue HKLM "SOFTWARE\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "MoveInProgress"
 DeleteRegValue HKLM "SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft Games\\Allegiance\\$ver" "MoveInProgress"
@@ -344,8 +344,8 @@ SectionEnd ; end the section
 
 Section -AdditionalIcons
   WriteIniStr "\$INSTDIR\\\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "\${PRODUCT_WEB_SITE}"
-;  CreateShortCut "\$SMPROGRAMS\\Free Allegiance\\Website.lnk" "\$INSTDIR\\\${PRODUCT_NAME}.url"
-;  CreateShortCut "\$SMPROGRAMS\\Free Allegiance\\Uninstall.lnk" "\$INSTDIR\\uninst.exe"
+;  CreateShortCut "\$SMPROGRAMS\\Allegiance Zone\\Website.lnk" "\$INSTDIR\\\${PRODUCT_NAME}.url"
+;  CreateShortCut "\$SMPROGRAMS\\Allegiance Zone\\Uninstall.lnk" "\$INSTDIR\\uninst.exe"
 SectionEnd
 
 Section -Post
@@ -363,7 +363,7 @@ SectionEnd
 Section "DirectX Install" SEC_DIRECTX
 SectionIn RO
  SetOutPath "\$TEMP"
- File "C:\\dxwebsetup.exe"
+ File "C:\\build\\External\\dxwebsetup.exe"
  LogEx::Write true true "Running DirectX Setup..."
  ExecWait '"\$TEMP\\dxwebsetup.exe"' \$DirectXSetupError
  LogEx::Write true true "Finished DirectX Setup"
@@ -407,8 +407,8 @@ StrCmp \$INSTDIR "" skipdel
 !insertmacro RemoveFilesAndSubDirs "\$INSTDIR\\"
 skipdel:
 
-  Delete "\$DESKTOP\\Free Allegiance.lnk"
-  Delete "\$SMPROGRAMS\\\$ICONS_GROUP\\Free Allegiance.lnk"
+  Delete "\$DESKTOP\\Allegiance Zone.lnk"
+  Delete "\$SMPROGRAMS\\\$ICONS_GROUP\\Allegiance Zone.lnk"
   Delete "\$SMPROGRAMS\\\$ICONS_GROUP\\Allegiance Learning Guide.lnk"
   RMDir "\$SMPROGRAMS\\\$ICONS_GROUP"
   RMDir "\$INSTDIR"

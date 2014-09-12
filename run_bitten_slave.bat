@@ -1,3 +1,4 @@
+@echo off
 rem #Imago <imagotrigger@gmail.com> - Runs the bitten slave "dameon"
 
 :wut
